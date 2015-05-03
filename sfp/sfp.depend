@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1430632225 source:c:\users\jean\documents\github\process-simulador\sfp\main.c
+	<stdio.h>
+	<conio.h>
+	<time.h>
+

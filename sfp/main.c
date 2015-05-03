@@ -15,7 +15,7 @@ enum  { CRIADO, APTO, EXECUTANDO, BLOQUEADO, DESTRUIDO } state;
 
 void delay(int milliseconds);
 
-main ()
+int main ()
 {
 int nproc=20, vtemp=2,i=0,x;
 
@@ -101,11 +101,11 @@ do{
             for(x=0; x <= fila_cpu_ultimo; x++){ //move os processos para frente na fila
                 fila_cpu[x] = fila_cpu[x+1];
             }
-            fila_cpu[fila_cpu_ultimo+1] = temp; //coloca de volta o processo no final da fila
+            fila_cpu[fila_cpu_ultimo-1] = temp; //coloca de volta o processo no final da fila
         }
         //srand (time(NULL)); //renova o seed do rand
-        if(rand() %1000 < 1){
-            //sorteio_device = (rand() %3);
+        if(rand() %1000 < 100){
+            sorteio_device = (rand() %3);
             switch ( sorteio_device )
               {
                  case 0 : //HD
@@ -155,13 +155,9 @@ do{
 printf("\n sorteio=%d\n", sorteio_device);
 //for(x=0;x<nproc;x++){
 printf("pid:%d ciclos:%d\n",procs[fila_cpu[0]].pid,procs[fila_cpu[0]].cycles_executados);
-printf("\n ultimo_cpu %d\n", procs[fila_cpu[fila_cpu_ultimo]]);
+//printf("\n ultimo_cpu %d\n", procs[fila_cpu[fila_cpu_ultimo]]);
 //}
 
-printf("\n FILA CPU\n");
-for(x=0;x<fila_cpu_ultimo;x++){
-    printf("%d ", procs[fila_cpu[x]].pid);
-}
 printf("\n FILA HD\n");
 for(x=0;x<fila_hd_ultimo;x++){
     printf("%d ", procs[fila_hd[x]].pid);
@@ -173,6 +169,11 @@ for(x=0;x<fila_impressora_ultimo;x++){
 printf("\n FILA VIDEO\n");
 for(x=0;x<fila_video_ultimo;x++){
     printf("%d ", procs[fila_video[x]].pid);
+}
+printf("\n ultimo_cpu: %d", fila_cpu_ultimo);
+printf("\n FILA CPU\n");
+for(x=0;x<fila_cpu_ultimo;x++){
+    printf("%d ", procs[fila_cpu[x]].pid);
 }
 }while(fila_cpu_ultimo > 0);
 
