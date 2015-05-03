@@ -16,9 +16,13 @@ int processado;
 
 void delay(int milliseconds);
 
-int main ()
+int main ( int argc, char *argv[] )
 {
-int nproc=20, vtemp=2,i=0,x;
+    int nproc=200, vtemp=2000,i=0,x;
+
+    sscanf(argv[1], "-n%d", &nproc);
+    sscanf(argv[2], "-t%d", &vtemp);
+    printf("%d", vtemp);
 
 struct processo procs[nproc];
 
@@ -224,7 +228,7 @@ printf("\n");
     for(x=0;x<fila_cpu_ultimo;x++){
         printf("%d ", procs[fila_cpu[x]].pid);
     }
-    delay(1);
+    delay(vtemp);
 printf("\n sorteio=%d\n", sorteio_device);
 //for(x=0;x<nproc;x++){
 //printf("\n ultimo_cpu %d\n", procs[fila_cpu[fila_cpu_ultimo]]);
