@@ -21,6 +21,9 @@ int nproc=20, vtemp=2,i=0,x;
 
 struct processo procs[nproc];
 
+int ultimo_pid = 0;
+int total_ciclos_cpu = 0;
+
 int fila_hd[nproc];
 int fila_hd_ultimo = 0;
 
@@ -40,6 +43,7 @@ int temp = 0;
 srand (time(NULL)); //renova o seed do rand
 
 //inicializa os processos
+/*
 for(x=0; x < nproc; x++){
     procs[x].pid = x;
     procs[x].cycles_required = (100 + rand() %200); // define os cyclos de CPU necessarios 100~300
@@ -51,9 +55,36 @@ for(x=0; x < nproc; x++){
     procs[x].state = CRIADO;
     fila_cpu[fila_cpu_ultimo] = x;
     fila_cpu_ultimo++;
-}
+}*/
+
+//cria o primeiro processo
+    procs[ultimo_pid].pid = ultimo_pid;
+        procs[ultimo_pid].cycles_required = (100 + rand() %200); // define os cyclos de CPU necessarios 100~300
+        procs[ultimo_pid].device_required = CPU;
+        procs[ultimo_pid].cycles_executados = 0;
+        procs[ultimo_pid].cpu_cycles = 0;
+        procs[ultimo_pid].device_cycles = 0;
+        procs[ultimo_pid].device_cycles_executados = 0;
+        procs[ultimo_pid].state = CRIADO;
+        fila_cpu[fila_cpu_ultimo] = ultimo_pid;
+        fila_cpu_ultimo++;
 
 do{
+    //cria novo processo
+    if(rand() %1000 < 200 && ultimo_pid < nproc){
+        ultimo_pid++;
+        procs[ultimo_pid].pid = ultimo_pid;
+        procs[ultimo_pid].cycles_required = (100 + rand() %200); // define os cyclos de CPU necessarios 100~300
+        procs[ultimo_pid].device_required = CPU;
+        procs[ultimo_pid].cycles_executados = 0;
+        procs[ultimo_pid].cpu_cycles = 0;
+        procs[ultimo_pid].device_cycles = 0;
+        procs[ultimo_pid].device_cycles_executados = 0;
+        procs[ultimo_pid].state = CRIADO;
+        fila_cpu[fila_cpu_ultimo] = ultimo_pid;
+        fila_cpu_ultimo++;
+    }
+
     //executa o HD
     if(fila_hd_ultimo >= 1){
         procs[fila_hd[0]].device_cycles_executados++;
@@ -183,7 +214,7 @@ printf("\n");
     for(x=0;x<fila_cpu_ultimo;x++){
         printf("%d ", procs[fila_cpu[x]].pid);
     }
-    delay(100);
+    delay(1);
 printf("\n sorteio=%d\n", sorteio_device);
 //for(x=0;x<nproc;x++){
 //printf("\n ultimo_cpu %d\n", procs[fila_cpu[fila_cpu_ultimo]]);
@@ -193,11 +224,14 @@ printf("\n sorteio=%d\n", sorteio_device);
 
 
 printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+total_ciclos_cpu++;
 }while(fila_cpu_ultimo > 0 || fila_hd_ultimo > 0 || fila_video_ultimo > 0 || fila_impressora_ultimo > 0);
 
 /*for(x=0; x<nproc; x++){
     printf("\npid=%d ciclos=%d", procs[x].pid, procs[x].cycles_required);
 }*/
+printf("\n processos criados: %d", ultimo_pid);
+printf("\n total de ciclos de CPU: %d", total_ciclos_cpu);
 printf("\n tcharam! \n");
 getch();
 return(0);
