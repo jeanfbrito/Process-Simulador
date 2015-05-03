@@ -37,6 +37,7 @@ int sorteio_device = 0;
 
 int temp = 0;
 
+srand (time(NULL)); //renova o seed do rand
 
 //inicializa os processos
 for(x=0; x < nproc; x++){
@@ -54,48 +55,73 @@ for(x=0; x < nproc; x++){
 
 do{
     //executa o HD
-    if(fila_hd_ultimo > 0){
+    if(fila_hd_ultimo >= 1){
         procs[fila_hd[0]].device_cycles_executados++;
+        printf("\n\nHD pid:%d ciclos:%d",procs[fila_hd[0]].pid,procs[fila_hd[0]].device_cycles_executados);
         if(procs[fila_hd[0]].device_cycles_executados >= procs[fila_hd[0]].device_cycles ){
             procs[fila_hd[0]].device_required = CPU;
-            for(x=nproc; x > fila_hd_ultimo; x--){
-                fila_hd[x] = fila_hd[x-1];
-                fila_hd_ultimo--;
+            fila_cpu[fila_cpu_ultimo] = fila_hd[0];
+            fila_cpu_ultimo++;
+            for(x=0; x <= fila_hd_ultimo; x++){ //move os processos para frente na fila
+                fila_hd[x] = fila_hd[x+1];
             }
+            fila_hd_ultimo--;
         }
+    }
+    printf("\n fila_hd_ultimo: %d", fila_hd_ultimo);
+    printf("\n FILA HD\n");
+    for(x=0;x<fila_hd_ultimo;x++){
+        printf("%d ", procs[fila_hd[x]].pid);
     }
 
     //executa a Impressora
-    if(fila_impressora_ultimo > 0){
+    if(fila_impressora_ultimo >= 1){
         procs[fila_impressora[0]].device_cycles_executados++;
+        printf("\n\nIMPRESSORA pid:%d ciclos:%d",procs[fila_impressora[0]].pid,procs[fila_impressora[0]].device_cycles_executados);
         if(procs[fila_impressora[0]].device_cycles_executados >= procs[fila_impressora[0]].device_cycles ){
             procs[fila_impressora[0]].device_required = CPU;
-            for(x=nproc; x > fila_impressora_ultimo; x--){
-                fila_impressora[x] = fila_impressora[x-1];
-                fila_impressora_ultimo--;
+            fila_cpu[fila_cpu_ultimo] = fila_impressora[0];
+            fila_cpu_ultimo++;
+            for(x=0; x <= fila_impressora_ultimo; x++){ //move os processos para frente na fila
+                fila_impressora[x] = fila_impressora[x+1];
             }
+            fila_impressora_ultimo--;
         }
+    }
+    printf("\n fila_impressora_ultimo: %d", fila_impressora_ultimo);
+    printf("\n FILA IMPRESSORA\n");
+    for(x=0;x<fila_impressora_ultimo;x++){
+        printf("%d ", procs[fila_impressora[x]].pid);
     }
 
     //executa o Video
-    if(fila_video_ultimo > 0){
+    if(fila_video_ultimo >= 1){
         procs[fila_video[0]].device_cycles_executados++;
+        printf("\n\nVIDEO pid:%d ciclos:%d",procs[fila_video[0]].pid,procs[fila_video[0]].device_cycles_executados);
         if(procs[fila_video[0]].device_cycles_executados >= procs[fila_video[0]].device_cycles ){
-            procs[fila_video[0]].state = DESTRUIDO;
-            for(x=nproc; x > fila_video_ultimo; x--){
-                fila_video[x] = fila_video[x-1];
-                fila_video_ultimo--;
+            procs[fila_video[0]].device_required = CPU;
+            fila_cpu[fila_cpu_ultimo] = fila_video[0];
+            fila_cpu_ultimo++;
+            for(x=0; x <= fila_video_ultimo; x++){ //move os processos para frente na fila
+                fila_video[x] = fila_video[x+1];
             }
+            fila_video_ultimo--;
         }
     }
-
+    printf("\n fila_video_ultimo: %d", fila_video_ultimo);
+    printf("\n FILA VIDEO\n");
+    for(x=0;x<fila_video_ultimo;x++){
+        printf("%d ", procs[fila_video[x]].pid);
+    }
+printf("\n");
     //executa o CPU
-    if(fila_cpu_ultimo > 0){
+    if(fila_cpu_ultimo >= 1){
         procs[fila_cpu[0]].cycles_executados++;
         procs[fila_cpu[0]].cpu_cycles++;
+        printf("\n\npid:%d ciclos:%d",procs[fila_cpu[0]].pid,procs[fila_cpu[0]].cycles_executados);
 
         //limita a 50 ciclos maximos de CPU
-        if(procs[fila_cpu[0]].cpu_cycles > 5){
+        if(procs[fila_cpu[0]].cpu_cycles > 50){
             procs[fila_cpu[0]].cpu_cycles = 0;// zera o contador de ciclos de cpu
             temp = fila_cpu[0]; //copia para temp o primeiro processo //fila_cpu[fila_cpu_ultimo+1] = fila_cpu[0]; //copia para o endereço apos o ultimo, o primeiro da fila
             for(x=0; x <= fila_cpu_ultimo; x++){ //move os processos para frente na fila
@@ -103,8 +129,8 @@ do{
             }
             fila_cpu[fila_cpu_ultimo-1] = temp; //coloca de volta o processo no final da fila
         }
-        //srand (time(NULL)); //renova o seed do rand
-        if(rand() %1000 < 100){
+        if(rand() %1000 < 10){
+            procs[fila_cpu[0]].device_cycles_executados = 0; //zera os ciclos de dispositivo
             sorteio_device = (rand() %3);
             switch ( sorteio_device )
               {
@@ -142,45 +168,37 @@ do{
                  break;
               }
         }
-
-        if(procs[fila_cpu[0]].cycles_executados >= procs[fila_cpu[0]].cycles_required ){
-            procs[fila_cpu[0]].device_required = CPU;
-            for(x=nproc; x > fila_cpu_ultimo; x--){
-                fila_cpu[x] = fila_cpu[x-1];
+        if(fila_cpu_ultimo >= 1){
+            if(procs[fila_cpu[0]].cycles_executados >= procs[fila_cpu[0]].cycles_required ){
+                procs[fila_cpu[0]].device_required = CPU;
+                for(x=0; x <= fila_cpu_ultimo; x++){ //move os processos para frente na fila
+                    fila_cpu[x] = fila_cpu[x+1];
+                }
                 fila_cpu_ultimo--;
             }
         }
     }
+    printf("\n fila_cpu_ultimo: %d", fila_cpu_ultimo);
+    printf("\n FILA CPU\n");
+    for(x=0;x<fila_cpu_ultimo;x++){
+        printf("%d ", procs[fila_cpu[x]].pid);
+    }
     delay(100);
 printf("\n sorteio=%d\n", sorteio_device);
 //for(x=0;x<nproc;x++){
-printf("pid:%d ciclos:%d\n",procs[fila_cpu[0]].pid,procs[fila_cpu[0]].cycles_executados);
 //printf("\n ultimo_cpu %d\n", procs[fila_cpu[fila_cpu_ultimo]]);
 //}
 
-printf("\n FILA HD\n");
-for(x=0;x<fila_hd_ultimo;x++){
-    printf("%d ", procs[fila_hd[x]].pid);
-}
-printf("\n FILA IMPRESSORA\n");
-for(x=0;x<fila_impressora_ultimo;x++){
-    printf("%d ", procs[fila_impressora[x]].pid);
-}
-printf("\n FILA VIDEO\n");
-for(x=0;x<fila_video_ultimo;x++){
-    printf("%d ", procs[fila_video[x]].pid);
-}
-printf("\n ultimo_cpu: %d", fila_cpu_ultimo);
-printf("\n FILA CPU\n");
-for(x=0;x<fila_cpu_ultimo;x++){
-    printf("%d ", procs[fila_cpu[x]].pid);
-}
-}while(fila_cpu_ultimo > 0);
+
+
+
+printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+}while(fila_cpu_ultimo > 0 || fila_hd_ultimo > 0 || fila_video_ultimo > 0 || fila_impressora_ultimo > 0);
 
 /*for(x=0; x<nproc; x++){
     printf("\npid=%d ciclos=%d", procs[x].pid, procs[x].cycles_required);
 }*/
-
+printf("\n tcharam! \n");
 getch();
 return(0);
 
